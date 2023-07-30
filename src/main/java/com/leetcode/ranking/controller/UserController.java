@@ -18,30 +18,38 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/user")
-    public ResponseEntity<String> addUser(@RequestBody User user) {
+    public ResponseEntity<Object> addUser(@RequestBody User user) {
         ServiceResult result = userService.addUser(user);
         if (result == ServiceResult.SUCCESS) {
+            String message = "The user " + user.getName() + " is added successfully in the database";
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("The user " + user.getName() + " is added successfully in the database");
-        } 
-        else {
+                                 .header("Content-Type", "application/json")
+                                 .body("{\"message\":\"" + message + "\"}");
+        } else {
+            String message = "Failed to add the user " + user.getName() + " to the database";
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to add the user " + user.getName() + " to the database");
+                                 .header("Content-Type", "application/json")
+                                 .body("{\"message\":\"" + message + "\"}");
         }
     }
+
 
     @PutMapping("/user/{userId}")
     public ResponseEntity<String> updateUser(@RequestBody User user, @PathVariable("userId") int id) {
         user.setId(id);
         ServiceResult result = userService.updateUser(user, id);
         if (result == ServiceResult.SUCCESS) {
-            return ResponseEntity.ok("The user " + user.getName() + " is successfully updated in the database");
+        	System.out.println("Put called");
+        	return ResponseEntity.status(HttpStatus.CREATED)
+                    .header("Content-Type", "application/json")
+                    .body("{\"message\":\"" + "updated success" + "\"}");
         } 
         else {
+        	System.out.println("Put else called"); 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Failed to update the user " + user.getName() + " in the database");
         }
-    }
+    }  
 
     @DeleteMapping("/user/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable("userId") int id) {
